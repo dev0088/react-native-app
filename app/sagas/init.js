@@ -9,7 +9,6 @@ function *watchReduxLoadFromDisk() {
     try {
       // Skip login if already logged in
       const { isAuthenticated } = yield select(getUser);
-
       //
       if (isAuthenticated) {
        	yield call(() => {});

@@ -5,10 +5,10 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { Router, Scene, Stack } from 'react-native-router-flux';
+import { Actions } from 'react-native-router-flux';
 
 import DefaultProps from '../constants/navigation';
 import AppConfig from '../constants/config';
-
 import AuthScenes from './auth';
 // import LoginScreen from '../containers/LoginScreen';
 import HomeScreen from '../containers/HomeScreen';
@@ -19,6 +19,8 @@ import LocaleScreen from '../containers/LocaleScreen';
 import LoginScreen from '../containers/LoginScreen';
 import ForgotPasswordScreen from '../containers/ForgotPasswordScreen';
 import SignUpScreen from '../containers/SignUpScreen';
+import TermScreen from '../containers/TermScreen';
+import PolicyScreen from '../containers/PolicyScreen';
 
 class TabIcon extends Component {
   render() {
@@ -34,28 +36,27 @@ class TabIcon extends Component {
 class UpperNetwork extends Component {
   componentDidMount() {
     StatusBar.setBarStyle('light-content');
+    if (this.props.isAuthenticated) {
+      Actions.push('home')
+    }
   }
 
   render() {
-    const { isAuthenticated } = this.props;
-
     return (
-
         <Router>
 					<Stack>
-						<Scene hideNavBar>
+						<Scene key='auhenticateScene' hideNavBar>
 							<Stack key="authenticate">
 								<Scene
 									key="login"
 									component={LoginScreen}
 									analyticsDesc="Login"
 									hideNavBar
-									initial={!isAuthenticated}
 								/>
 								<Scene
 									back
 									key="signUp"
-									title="SIGN UP"
+									title="Create Account"
 									{...DefaultProps.navbarProps}
 									component={SignUpScreen}
 								/>
@@ -65,6 +66,20 @@ class UpperNetwork extends Component {
 									title="FORGOT PASSWORD"
 									{...DefaultProps.navbarProps}
 									component={ForgotPasswordScreen}
+								/>
+								<Scene
+									back
+									key="term"
+									title="Terms and Service"
+									{...DefaultProps.navbarProps}
+									component={TermScreen}
+								/>
+								<Scene
+									back
+									key="policy"
+									title="Privacy Policy"
+									{...DefaultProps.navbarProps}
+									component={PolicyScreen}
 								/>
 							</Stack>
 						</Scene>
@@ -84,40 +99,6 @@ class UpperNetwork extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  tabBar: {
-    borderTopColor: '#e1e1e1',
-    borderTopWidth: 1,
-    backgroundColor: '#FFFFFF',
-    opacity: 0.98
-  },
-  navigationBarStyle: {
-    backgroundColor: '#00f'
-  },
-  navigationBarTitleStyle: {
-    color:'white'
-  },
-  navigationBarleftButtonTextStyle:{
-    color:'white'
-  },
-  navTitleStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 20
-  },
-  tabItem: {
-    flex: 1,
-    width: 100,
-    flexDirection: 'column',
-    alignItems: 'center',
-    alignSelf: 'center',
-    justifyContent: 'center'
-  }
-});
 
 const mapStateToProps = function(state) {
   const { user } = state;

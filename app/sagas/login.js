@@ -14,7 +14,7 @@ function loginCall({email, password}) {
     })
       .then(response => response.json())
       .then((userData) => {
-        console.log(userData)
+        // console.log(userData)
         if(userData.error) {
           reject({status: userData.error_description || userData.error});
         }
@@ -31,7 +31,6 @@ function loginCall({email, password}) {
 function *watchLoginRequest() {
   while(true) {
     const { email, password } = yield take(types.LOGIN.REQUEST);
-
     try {
       const payload = {
         email,
@@ -40,9 +39,9 @@ function *watchLoginRequest() {
       const response = yield call(loginCall, payload);
 
       yield put(loginSuccess(response));
-      console.log('SAGA LOGIN SUCCESS: ', response);
+      // console.log('SAGA LOGIN SUCCESS: ', response);
     } catch (err) {
-      console.log('SAGA LOGIN ERR: ', err);
+      // console.log('SAGA LOGIN ERR: ', err);
       yield put(loginFailure(err.status));
     }
   }

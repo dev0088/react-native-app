@@ -8,14 +8,14 @@ import Header from '../components/Header';
 import Spacer from '../components/Spacer';
 
 class ForgotPasswordScreen extends React.Component {
-  static propTypes = {
-    member: PropTypes.shape({
-      email: PropTypes.string,
-    }),
-    error: PropTypes.string,
-    loading: PropTypes.bool.isRequired,
-    onFormSubmit: PropTypes.func.isRequired,
-  }
+  // static propTypes = {
+  //   member: PropTypes.shape({
+  //     email: PropTypes.string,
+  //   }),
+  //   error: PropTypes.string,
+  //   loading: PropTypes.bool.isRequired,
+  //   onFormSubmit: PropTypes.func.isRequired,
+  // }
 
   static defaultProps = {
     error: null,
@@ -49,7 +49,7 @@ class ForgotPasswordScreen extends React.Component {
     const { loading, error } = this.props;
 
     // Loading
-    if (loading) return <Loading />;
+    // if (loading) return <Loading />;
 
     return (
       <Container>

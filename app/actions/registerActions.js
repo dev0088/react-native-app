@@ -1,24 +1,27 @@
 import * as types from './actionTypes';
 
-export function registerRequest(email, password) {
+export function registerRequest(emailAddress, password, 
+    passwordConfirm, firstName, lastName, phoneNumber, inviteCode,
+    userName, school, objective, chapter) {
   return {
     type: types.REGISTER.REQUEST,
-		inviteCode,
-		userName,
 		emailAddress,
-		password,
-		passwordConfirm,
-		firstName,
-		lastName,
-		phoneNumber,
-		allowNotifications,
-		acceptedTerms,
-		school,
-		club,
-		city,
-		careerLocation,
-		objective,
-		chapter
+    password,
+    passwordConfirm,
+    firstName,
+    lastName,
+    phoneNumber,
+    inviteCode,
+    userName,
+    school,
+    objective,
+    chapter
+  }
+}
+
+export function registerInit() {
+  return {
+    type: types.REGISTER.INIT,
   }
 }
 

@@ -6,7 +6,8 @@ const initialState = {
   access_token: '',
   token_type: '',
   expires_in: 0,
-  userName: ''
+  userName: '',
+  errorMessage: false
 };
 
 export default function user(state = initialState, action) {
@@ -15,6 +16,7 @@ export default function user(state = initialState, action) {
       return Object.assign({}, state, {
         isFetching: true,
         isAuthenticated: false,
+        errorMessage: false
       });
     case types.LOGIN.SUCCESS:
       return Object.assign({}, state, {
@@ -30,6 +32,16 @@ export default function user(state = initialState, action) {
         isAuthenticated: false,
         failure: true,
         errorMessage: action.err,
+      });
+    case types.LOGIN.INIT:
+      return Object.assign({}, state, {
+        isAuthenticated: false,
+        isFetching: false,
+        access_token: '',
+        token_type: '',
+        expires_in: 0,
+        userName: '',
+        errorMessage: false
       });
     case types.LOGOUT:
       return initialState;
