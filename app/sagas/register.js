@@ -86,11 +86,25 @@ function *watchRegisterRequest() {
       }
       const response = yield call(registerCall, payload);
 
-      if (response.Success)
+      if (response.Success){
+        console.log('SAGA REGISTER SUCCESS: ', response);
         yield put(registerSuccess(response));
-      else
-        yield put(registerFailure(response.ValidationErrors[0]));  
-      console.log('SAGA REGISTER SUCCESS: ', response);
+      }
+      else{
+        let errorMsg = (response.ValidationErrors == null || response.ValidationErrors == undefined)
+                          ? 'Unexpected error!' : response.ValidationErrors[0];
+        console.log('SAGA REGISTER UNEXPECTED ERR: ', response);
+        if (response.ValidationErrors != null && response.ValidationErrors != undefined)
+          errorMsg = response.ValidationErrors[0];
+        else if (response.ModelState != null && response.ModelState != undefined)
+        {
+          Object.keys(response.ModelState).forEach(function(key) {
+            errorMsg = response.ModelState[key][0];
+            return;
+          })
+        }
+        yield put(registerFailure(errorMsg));
+      }
     } catch (err) {
       console.log('SAGA REGISTER ERR: ', err);
       yield put(registerFailure(err.status));

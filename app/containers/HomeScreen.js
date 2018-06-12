@@ -17,6 +17,7 @@ import {
   Footer,
   FooterTab,
   Badge,
+  Thumbnail
 } from 'native-base';
 import { connect } from 'react-redux';
 import { StyleSheet, ImageBackground } from 'react-native';
@@ -94,13 +95,34 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'relative',
-    top: 10,
+    top: 30,
+    left: 4,
+    transform: [
+      { scale: 0.6 }
+    ],
+  },
+  footerLogo: {
+    width: 32,
+    height: 32,
+    alignSelf: "center"
+  },
+  footerActive: {
+    color: '#358A83',
+    fontSize: 12,
+  },
+  footerNormal: {
+    color: '#A1A1A1',
+    fontSize: 12,
   }
 });
 class HomeScreen extends Component {
+  state = {
+    activePage: 'actions'
+  };
   render() {
     const locale = 'en';
     const { user } = this.props;
+    const { activePage } = this.state;
     return (
       <Container>
         <Header style={styles.header}>
@@ -209,32 +231,47 @@ class HomeScreen extends Component {
               </View>
             </View>
           </View>
-          <Footer style={{backgroundColor: '#F9F9F9'}}>
-            <FooterTab>
-              <Button style={{backgroundColor: '#F9F9F9'}}>
-                <Icon name="apps" />
-                <Text>{translate('Interact', locale)}</Text>
-              </Button>
-              <Button>
-                <Icon name="camera" />
-                <Text>{translate('Learn', locale)}</Text>
-              </Button>
-              <Button active>
-                <Icon active name="navigate" />
-                <Text>{translate('Actions', locale)}</Text>
-              </Button>
-              <Button badge vertical>
-                <Badge style={styles.badge}><Text>2</Text></Badge>
-                <Icon name="person" />
-                <Text>{translate('Track', locale)}</Text>
-              </Button>
-              <Button>
-                <Icon name="apps" />
-                <Text>{translate('Self', locale)}</Text>
-              </Button>
-            </FooterTab>
-          </Footer>
         </Content>
+        <Footer style={{backgroundColor: '#F9F9F9'}}>
+          <FooterTab>
+            <Button style={{backgroundColor: '#F9F9F9'}}>
+              <Thumbnail
+                square
+                style={styles.footerLogo} 
+                source={activePage=='interact' ? require('../images/interact_active.jpg') : require('../images/interact.jpg')} />
+              <Text style={activePage=='interact' ? styles.footerActive : styles.footerNormal}>{translate('Interact', locale)}</Text>
+            </Button>
+            <Button>
+              <Thumbnail
+                square
+                style={styles.footerLogo} 
+                source={activePage=='learn' ? require('../images/learn_active.jpg') : require('../images/learn.jpg')} />
+              <Text style={activePage=='learn' ? styles.footerActive : styles.footerNormal}>{translate('Learn', locale)}</Text>
+            </Button>
+            <Button>
+              <Thumbnail
+                square
+                style={styles.footerLogo} 
+                source={activePage=='actions' ? require('../images/actions_active.jpg') : require('../images/actions.jpg')} />
+              <Text style={activePage=='actions' ? styles.footerActive : styles.footerNormal}>{translate('Actions', locale)}</Text>
+            </Button>
+            <Button badge vertical>
+              <Badge style={styles.badge}><Text>1</Text></Badge>
+              <Thumbnail
+                square
+                style={styles.footerLogo} 
+                source={activePage=='track' ? require('../images/track_active.jpg') : require('../images/track.jpg')} />
+              <Text style={activePage=='track' ? styles.footerActive : styles.footerNormal}>{translate('Track', locale)}</Text>
+            </Button>
+            <Button>
+              <Thumbnail
+                square
+                style={styles.footerLogo} 
+                source={activePage=='self' ? require('../images/self_active.jpg') : require('../images/self.jpg')} />
+              <Text style={activePage=='self' ? styles.footerActive : styles.footerNormal}>{translate('Self', locale)}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
       </Container>
     );
   }

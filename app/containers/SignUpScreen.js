@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   	width: 35
   },
   input: { 	
-  	color: '#053C5C'
+  	color: '#053C5C',
   },
   note: {
   	fontSize: 10,
@@ -197,6 +197,7 @@ class SignUpScreen extends React.Component {
       currentSlide: 0,
       jobType: 0,
       showSuccessAlert: false,
+      showFailureAlert: false,
       registerRequest: false
     };
 
@@ -214,11 +215,12 @@ class SignUpScreen extends React.Component {
 				jobType, 
 				tempCode,
 				inviteCode,
-				showSuccessAlert
+				showSuccessAlert,
+				showFailureAlert
 			} = this.state;
 		const { register } = this.props;
-		if (jobType>0 && tempCode==inviteCode 
-				&& !showSuccessAlert && !register.isRegistered)
+		if (jobType>0 && ''!=inviteCode 
+				&& !showSuccessAlert && !showFailureAlert && !register.isRegistered)
 		{
 			const {
 				emailAddress,
@@ -375,6 +377,12 @@ class SignUpScreen extends React.Component {
   			this.setState({ showSuccessAlert: false, registerRequest: false });
   		}, 5000)
   	}
+  	if (register.failure) {
+  		this.setState({ showFailureAlert: true });
+  		setTimeout(() => {
+  			this.setState({ showFailureAlert: false, registerRequest: false });
+  		}, 5000)
+  	}
   }
  	//
   // handleSubmit = () => {
@@ -395,8 +403,10 @@ class SignUpScreen extends React.Component {
 				tempCode,
 				inviteCode,
 				showSuccessAlert,
+				showFailureAlert,
 				registerRequest
 			} = this.state;
+
     return (
       <Container>
         <Content style={[styles.content, this.state.alertVisible && styles.opacity]}>
@@ -406,7 +416,6 @@ class SignUpScreen extends React.Component {
 		          	Tell us about yourself.
 		          </H1>
 						</View>
-						{register.errorMessage && <Messages message={register.errorMessage} />}
 						<Spacer size={20} />
 						<Body>
 							<Item>
@@ -495,6 +504,7 @@ class SignUpScreen extends React.Component {
 		          </H1>
 						</View>
 						{showSuccessAlert && <Messages type={'success'} message={translate('You are registered successfully', locale)} />}
+						{(showFailureAlert && register.errorMessage) &&  <Messages message={register.errorMessage} />}
 						<Spacer size={10} />
 						<Button 
             	full 
@@ -535,7 +545,7 @@ class SignUpScreen extends React.Component {
             </Item>
             <Button 
             	full 
-            	style={(jobType>0 && tempCode==inviteCode && !showSuccessAlert && !register.isRegistered) ? styles.validateButton: styles.button} 
+            	style={(jobType>0 && ''!=inviteCode && !showSuccessAlert && !register.isRegistered) ? styles.validateButton: styles.button} 
             	onPress={() => this.handleSignUp()}>
 							<Text style={styles.buttonText}>{translate('Sign Up', locale)}</Text>
 							{(registerRequest && !showSuccessAlert) && <Spinner color='white' size="small" />}
