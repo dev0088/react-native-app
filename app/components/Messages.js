@@ -10,6 +10,7 @@ const Messages = ({ message, type }) => (
       backgroundColor: (type === 'error') ? Colors.brandDanger : (type === 'success') ? Colors.brandSuccess : Colors.brandInfo,
       paddingVertical: 10,
       paddingHorizontal: 5,
+      width: '100%',
     }}
   >
     <Text style={{ color: '#fff', textAlign: 'center' }}>{message}</Text>

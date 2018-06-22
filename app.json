@@ -4,6 +4,13 @@
     "name": "UpperNetwork",
     "slug": "uppernetwork",
     "icon": "app/images/app-icon.png",
-    "privacy": "public"
+    "version": "1.0.0",
+    "privacy": "public",
+    "ios": {
+    	"supportsTablet": true
+    },
+    "android": {
+    	"package": "net.mentorscore.uppernetwork"
+    }
   }
 }

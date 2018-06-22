@@ -24,13 +24,12 @@ import {
 } from 'native-base';
 import { connect } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
-import { StyleSheet, ImageBackground } from 'react-native';
+import { StyleSheet, ImageBackground, Image } from 'react-native';
 import { bindActionCreators } from 'redux';
 import Dimensions from 'Dimensions';
 import * as loginActions from '../actions/loginActions';
 import { translate } from '../i18n';
 import Messages from '../components/Messages';
-import Header from '../components/Header';
 import Spacer from '../components/Spacer';
 import Logo from '../images/logo.png'
 const {width, height} = Dimensions.get('window');
@@ -103,9 +102,10 @@ class LoginScreen extends Component {
                 source={require('../images/background.png')} >
             <View style={styles.content}>
   						<Spacer size={41} />
-  						<Thumbnail 
-  							style={{ alignSelf: "center" }} 
-  							source={require('../images/logo.png')} />
+              <Image 
+                style={{width: 241, alignSelf: "center"}}
+                source={require('../images/logo2.png')} 
+                resizeMode={Image.resizeMode.contain} />
   						<Spacer size={40} />
   						<Body>
   	            <Item>
