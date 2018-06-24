@@ -58,6 +58,7 @@ Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
 
 #### `npm run ios`
 
+
 Like `npm start`, but also attempts to open your app in the iOS Simulator if you're on a Mac and have it installed.
 
 #### `npm run android`
@@ -136,6 +137,10 @@ Install the `exp` command-line tool, and run the publish command:
 ```
 $ npm i -g exp
 $ exp publish
+
+$ exp build:android
+# or
+$ exp build:ios
 ```
 
 ### Building an Expo "standalone" app
