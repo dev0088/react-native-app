@@ -1,17 +1,17 @@
-import * as types from './actionTypes';
-import { Actions } from 'react-native-router-flux';
+import * as types from './actionTypes'
+import { Actions } from 'react-native-router-flux'
 
 export function loginRequest(email, password) {
   return {
     type: types.LOGIN.REQUEST,
     email,
-    password,
+    password
   }
 }
 
 export function loginInit() {
   return {
-    type: types.LOGIN.INIT,
+    type: types.LOGIN.INIT
   }
 }
 
@@ -26,13 +26,13 @@ export function loginSuccess(payload) {
 export function loginFailure(err) {
   return {
     type: types.LOGIN.FAILURE,
-    err,
+    err
   }
 }
 
 export function logout() {
   Actions.push('login')
   return {
-    type: types.LOGOUT,
+    type: types.LOGOUT
   }
 }

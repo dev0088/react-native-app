@@ -1,31 +1,37 @@
-import * as types from './actionTypes';
+import * as types from './actionTypes'
+import { Actions } from 'react-native-router-flux'
 
-export function registerRequest(emailAddress, password, 
-    passwordConfirm, firstName, lastName, phoneNumber, inviteCode,
-    userName, school, objective, chapter) {
+export function registerRequest(
+  emailAddress,
+  password,
+  passwordConfirm,
+  firstName,
+  lastName,
+  phoneNumber,
+  inviteCode,
+  userName
+) {
   return {
     type: types.REGISTER.REQUEST,
-		emailAddress,
+    emailAddress,
     password,
     passwordConfirm,
     firstName,
     lastName,
     phoneNumber,
     inviteCode,
-    userName,
-    school,
-    objective,
-    chapter
+    userName
   }
 }
 
 export function registerInit() {
   return {
-    type: types.REGISTER.INIT,
+    type: types.REGISTER.INIT
   }
 }
 
 export function registerSuccess(payload) {
+  Actions.push('home')
   return {
     type: types.REGISTER.SUCCESS,
     ...payload
@@ -35,6 +41,6 @@ export function registerSuccess(payload) {
 export function registerFailure(err) {
   return {
     type: types.REGISTER.FAILURE,
-    err,
+    err
   }
 }
