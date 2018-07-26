@@ -7,6 +7,7 @@
     "react-native-scripts": "1.14.0",
     "react-test-renderer": "16.3.1",
     "remote-redux-devtools": "^0.5.12",
+		"redux-devtools-extension": "^2.13.5",
     "remote-redux-devtools-on-debugger": "^0.8.3"
   },
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",

@@ -21,6 +21,8 @@ import {
   Grid,
   Row,
   Col,
+  List,
+  ListItem
 } from 'native-base';
 import { connect } from 'react-redux';
 import { StyleSheet, ImageBackground, Alert } from 'react-native';
@@ -51,8 +53,7 @@ function createStyleSheet(organizationColor) {
       color: '#F9F9F9',
     },
     rumPhotoArea: {
-      width: '100%',
-      height: 205,
+      width: '100%'
     },
     rumBackground: {
       width: '100%',
@@ -64,27 +65,35 @@ function createStyleSheet(organizationColor) {
       marginTop: 11,
       alignSelf: 'center',
     },
-    rumInfoName: {
+    userInfoName: {
       color: uiColor.getSecondaryColor(organizationColor),
       fontSize: 17,
-      alignSelf: 'center',
+      // alignSelf: 'center',
+      justifyContent: 'flex-start',
       marginTop: 10,
       lineHeight: 19,
     },
-    rumInfoDate: {
+    userInfoDate: {
       color: '#A1A1A1',
       fontSize: 11,
-      alignSelf: 'center',
+      // alignSelf: 'center',
+      justifyContent: 'flex-start',
     },
-    rumInfoContact: {
+    userInfoContact: {
       height: 20,
-      alignSelf: 'center',
+      // alignSelf: 'center',
+      justifyContent: 'flex-start',
       paddingTop: 0,
       paddingBottom: 0,
     },
-    rumInfoContactText: {
+    userInfoContactText: {
       color: uiColor.getSecondaryColor(organizationColor),
       fontSize: 11,
+      paddingLeft: 0,
+      paddingRight: 0
+    },
+    userInfoDetailsButton: {
+      paddingLeft: 0,
     },
     contactButtons: {
       flexDirection: 'row',
@@ -95,12 +104,32 @@ function createStyleSheet(organizationColor) {
       alignSelf: 'center',
       marginTop: 14,
     },
+    promptButtonEach: {
+      width: 60,
+      height: 60,
+      marginLeft: 17,
+      marginRight: 17,
+      flex: 1
+    },
     contactButtonEach: {
       width: 30,
       height: 30,
       marginLeft: 17,
       marginRight: 17,
       flex: 1
+    },
+    promptButtonImage: {
+      width: 60,
+      height: 60,
+      alignSelf: 'center'
+    },
+    promptName: {
+      color: '#7E888D',
+      fontSize: 12,
+      paddingLeft: 10,
+      paddingTop: 13,
+      height: 30,
+      alignSelf: 'center'
     },
     contactButtonImage: {
       width: 30,
@@ -109,9 +138,15 @@ function createStyleSheet(organizationColor) {
     rumTabArea: {
 
     },
-    profileRow: {
+    promptRow: {
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    promptColView: {
       justifyContent: 'center',
       alignItems: 'center',
+      top: 10,
+      height: 120
     },
     profileStatus: {
       color: uiColor.getSecondaryColor(organizationColor),
@@ -367,26 +402,27 @@ function createStyleSheet(organizationColor) {
   });
 }
 
-class InteractRumScreen extends Component {
-  // state = {
-  //   activePage: 'interact',
-  //   profileIndex: 0,
-  //   styles: createStyleSheet()
-  // };
+class SelfScreen extends Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      activePage: 'interact',
+      activePage: 'self',
       profileIndex: 0,
       styles: createStyleSheet(props.organizationColor)
     };
-
-    this.renderTabProfile = this.renderTabProfile.bind(this);
+    this.renderTabPrompt = this.renderTabPrompt.bind(this);
     this.renderTabTasks = this.renderTabTasks.bind(this);
-    this.renderTabNotes = this.renderTabNotes.bind(this);
+    this.renderTabObjects = this.renderTabObjects.bind(this);
     this.renderTabHistory = this.renderTabHistory.bind(this);
+  }
+
+  componentDidMount = () => {
+    const { register, auth } = this.props
+		if (register.isRegistered && auth.fromRegistration && !auth.checkedOnboarding.self){
+      Actions.push('introduceSelf')
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -406,75 +442,59 @@ class InteractRumScreen extends Component {
   }
 
   contactInfo = () => {
-    Actions.push('contact');
+    this.details()
   }
 
-  contactInfo = () => {
+  details = () => {
     Actions.push('editProfile');
   }
 
+  handleLogout = () => {
+    this.props.loginActions.logoutRequest(
+      this.props.auth.access_token, this.props.auth.token_type
+    )
+  }
+
   renderView = (locale) => {
-    const { organizationColor } = this.props
+    const { user, organizationColor } = this.props
     const { styles } = this.state
+    const userInfo = user.userInfo
     return (
       <View>
         <View style={styles.rumPhotoArea}>
-          <ImageBackground
-            style={styles.rumBackground}
-            source={require('../images/rum_profile_background.png')} >
-            <Thumbnail
-              square
-              style={styles.rumPhoto}
-              source={require('../images/rum_profile_photo.png')} />
-            <View style={styles.rumInfo} >
-              <Text style={styles.rumInfoName}>
-                First Last
-              </Text>
-              <Text style={styles.rumInfoDate}>
-                Member since 06/06/2018
-              </Text>
-              <Button
-                transparent
-                style={styles.rumInfoContact}
-                onPress={() => this.contactInfo()}>
-                <Text style={styles.rumInfoContactText}>
-                  { translate('Contact Info', locale) }
-                </Text>
-              </Button>
-            </View>
-            <View style={styles.contactButtons}>
-              <Button
-                transparent
-                style={styles.contactButtonEach}
-                onPress={this.contactChat}
-                >
+          <List>
+            <ListItem thumbnail>
+              <Left>
                 <Thumbnail
-                  square
-                  style={styles.contactButtonImage}
-                  source={require('../images/rum_profile_chat.png')} />
-              </Button>
-              <Button
-                transparent
-                style={styles.contactButtonEach}
-                onPress={this.contactChat}
-                >
-                <Thumbnail
-                  square
-                  style={styles.contactButtonImage}
-                  source={require('../images/rum_profile_call.png')} />
-              </Button>
-              <Button
-                transparent
-                style={styles.contactButtonEach}
-                onPress={this.contactChat}
-                >
-                <Thumbnail
-                  square
-                  style={styles.contactButtonImage}
-                  source={require('../images/rum_profile_mail.png')} />
-              </Button>
-            </View>
-          </ImageBackground>
+                   circle
+                   style={styles.rumPhoto}
+                   source={require('../images/rum_profile_photo.png')} />
+                </Left>
+                <Body>
+                  <Text style={styles.userInfoName}>
+                   {userInfo && `${userInfo.Person.FirstName} ${userInfo.Person.LastName}`}
+                  </Text>
+                  <Text note numberOfLines={1}>
+                    {userInfo && `${translate('Member since', locale)} ${new Date(userInfo.Person.DateCreated).toLocaleDateString()}`}
+                  </Text>
+                  <Button
+                    transparent
+                    style={styles.userInfoContact}
+                    onPress={() => this.contactInfo()}>
+                    <Text style={styles.userInfoContactText}>
+                      { translate('Contact Info', locale) }
+                    </Text>
+                  </Button>
+                </Body>
+               <Right>
+                 <Button transparent
+                  style={styles.userInfoDetailsButton}
+                  onPress={() => this.details()}>
+                   <Text>{ translate('Details', locale) }</Text>
+                 </Button>
+               </Right>
+             </ListItem>
+           </List>
         </View>
         <Tabs
           style={styles.rumTabArea}
@@ -486,8 +506,8 @@ class InteractRumScreen extends Component {
             textStyle={{color: '#7E888D', fontSize: 12}}
             activeTabStyle={{backgroundColor: 'white'}}
             activeTextStyle={{ color: uiColor.getSecondaryColor(organizationColor), fontWeight: 'normal', fontSize: 12 }}
-            heading={ translate('PROFILE', locale) } >
-            { this.renderTabProfile(locale) }
+            heading={ translate('PROMPTS', locale) } >
+            { this.renderTabPrompt(locale) }
           </Tab>
           <Tab
             tabStyle={{backgroundColor: 'white', height: 30, borderBottomWidth:1, borderColor: '#C8C7CC'}}
@@ -502,8 +522,16 @@ class InteractRumScreen extends Component {
             textStyle={{color: '#7E888D', fontSize: 12}}
             activeTabStyle={{backgroundColor: 'white', borderBottomWidth: 2, borderColor: uiColor.getSecondaryColor(organizationColor)}}
             activeTextStyle={{color: uiColor.getSecondaryColor(organizationColor), fontWeight: 'normal', fontSize: 12}}
-            heading={ translate('NOTES', locale) }>
-            { this.renderTabNotes(locale) }
+            heading={ translate('SCHEDULE', locale) }>
+            { this.renderTabObjects(locale) }
+          </Tab>
+          <Tab
+            tabStyle={{backgroundColor: 'white', height: 30, borderBottomWidth:1, borderColor: '#C8C7CC'}}
+            textStyle={{color: '#7E888D', fontSize: 12}}
+            activeTabStyle={{backgroundColor: 'white', borderBottomWidth: 2, borderColor: uiColor.getSecondaryColor(organizationColor)}}
+            activeTextStyle={{color: uiColor.getSecondaryColor(organizationColor), fontWeight: 'normal', fontSize: 12}}
+            heading={ translate('OBJECTS', locale) }>
+            { this.renderTabObjects(locale) }
           </Tab>
           <Tab
             tabStyle={{backgroundColor: 'white', height: 30, borderBottomWidth:1, borderColor: '#C8C7CC'}}
@@ -522,139 +550,60 @@ class InteractRumScreen extends Component {
     this.setState({ profileIndex: id });
   }
 
-  renderTabProfile = (locale) => {
+  renderTabPrompt = (locale) => {
     let { profileIndex, styles } = this.state;
-    if (profileIndex === 0){
-      return (
-        <Grid>
-          <Row style={styles.profileRow}>
-            <Text style={styles.profileStatus}>
-              {translate('This user has not shared their Birkman results with you.', locale)}
-            </Text>
-          </Row>
-          <Row style={styles.profileRow}>
-            <Button
-              style={styles.profileButton}
-              onPress={() => this.requestChangeProfileIndex(1)} >
-              <Text style={styles.profileButtonText}>
-                { translate('REQUEST', locale) }
+    return (
+      <Grid>
+        <Row style={styles.promptRow}>
+          <Col>
+            <View style={styles.promptColView}>
+              <Thumbnail
+                circle
+                style={styles.promptButtonImage}
+                source={require('../images/WhoTheyKnow.png')} />
+              <Text style={styles.promptName}>
+                { translate('Who I Know', locale) }
               </Text>
-              <Text style={styles.profileButtonTextSmall}>
-                { translate('Birkman Report', locale) }
+            </View>
+          </Col>
+          <Col>
+            <View style={styles.promptColView}>
+              <Thumbnail
+                circle
+                style={styles.promptButtonImage}
+                source={require('../images/WhatTheyKnow.png')} />
+              <Text style={styles.promptName}>
+                { translate('What I Know', locale) }
               </Text>
-            </Button>
-          </Row>
-          <Row style={styles.profileRow}>
-            <Button style={styles.profileButton}>
-              <Text style={styles.profileButtonText}>
-                { translate('SHARE', locale) }
+            </View>
+          </Col>
+        </Row>
+        <Row style={styles.promptRow}>
+          <Col>
+            <View style={styles.promptColView}>
+              <Thumbnail
+                circle
+                style={styles.promptButtonImage}
+                source={require('../images/TheirInterests.png')} />
+              <Text style={styles.promptName}>
+                { translate('What I Like', locale) }
               </Text>
-              <Text style={styles.profileButtonTextSmall}>
-                { translate('my Birkman Report', locale) }
+            </View>
+          </Col>
+          <Col>
+            <View style={styles.promptColView}>
+              <Thumbnail
+                square
+                style={styles.promptButtonImage}
+                source={require('../images/TheirMotivations.png')} />
+              <Text style={styles.promptName}>
+                { translate('What I Love', locale) }
               </Text>
-            </Button>
-          </Row>
-          <Row style={styles.profileRow}>
-            <Button
-              transparent
-              style={styles.profileHelpButton} >
-              <Text style={styles.profileHelpButtonText}>
-                { translate('Need Help?', locale) }
-              </Text>
-              <Text style={styles.profileHelpButtonTextSmall}>
-                { translate('Get help interpreting your Birkman.', locale) }
-              </Text>
-            </Button>
-          </Row>
-        </Grid>
-      )
-    }
-    else
-    {
-      let icons = [
-        "ios-arrow-down",
-        "ios-arrow-forward"
-      ]
-      return (
-        <Grid>
-          <Row style={styles.slideDown}>
-            <Button
-              transparent
-              style={styles.slideDownButton}
-              onPress={() => this.requestChangeProfileIndex(1)} >
-              <Text style={styles.slideDownButtonText}>
-                { translate('Birkman Map', locale) }
-              </Text>
-              <Icon
-                style={styles.slideDownButtonIcon}
-                name={(profileIndex===1) ? icons[0] : icons[1]} />
-            </Button>
-          </Row>
-          {
-            (profileIndex === 1) && (
-              <Row style={styles.slideDown}>
-                <Thumbnail
-                  square
-                  style={styles.birkmanMap}
-                  source={require('../images/birkman_map.jpg')} />
-              </Row>
-            )
-          }
-          <Row style={styles.slideDown}>
-            <Button
-              transparent
-              style={styles.slideDownButton}
-              onPress={() => this.requestChangeProfileIndex(2)} >
-              <Text style={styles.slideDownButtonText}>
-                { translate('Birkman Interests', locale) }
-              </Text>
-              <Icon
-                style={styles.slideDownButtonIcon}
-                name={(profileIndex===2) ? icons[0] : icons[1]} />
-            </Button>
-          </Row>
-          <Row style={styles.slideDown}>
-            <Button
-              transparent
-              style={styles.slideDownButton}
-              onPress={() => this.requestChangeProfileIndex(3)} >
-              <Text style={styles.slideDownButtonText}>
-                { translate('Birkman Components', locale) }
-              </Text>
-              <Icon
-                style={styles.slideDownButtonIcon}
-                name={(profileIndex===3) ? icons[0] : icons[1]} />
-            </Button>
-          </Row>
-          {
-            (profileIndex === 3) && (
-              <Row style={styles.slideDown}>
-                <View style={styles.slideDownView} >
-                  <Button style={styles.profileButton}>
-                    <Text style={styles.profileButtonText}>
-                      { translate('SHARE', locale) }
-                    </Text>
-                    <Text style={styles.profileButtonTextSmall}>
-                      { translate('my Birkman Report', locale) }
-                    </Text>
-                  </Button>
-                  <Button
-                    transparent
-                    style={styles.profileHelpButton} >
-                    <Text style={styles.profileHelpButtonText}>
-                      { translate('Need Help?', locale) }
-                    </Text>
-                    <Text style={styles.profileHelpButtonTextSmall}>
-                      { translate('Get help interpreting your Birkman.', locale) }
-                    </Text>
-                  </Button>
-                </View>
-              </Row>
-            )
-          }
-        </Grid>
-      )
-    }
+            </View>
+          </Col>
+        </Row>
+      </Grid>
+    )
   }
 
   renderTabTasks = (locale) => {
@@ -759,7 +708,7 @@ class InteractRumScreen extends Component {
     )
   }
 
-  renderTabNotes = (locale) => {
+  renderTabObjects = (locale) => {
     let notes = [
       {
         id: 1,
@@ -964,13 +913,9 @@ class InteractRumScreen extends Component {
       <Container>
         <Header style={styles.header}>
           <Left style={{ flex: 2 }}>
-            <Button transparent onPress={this.goBack}>
-              <Icon name="arrow-back" />
-              <Text style={styles.backText}>Interact</Text>
-            </Button>
           </Left>
           <Body style={{ flex: 3 }}>
-            <Title style={styles.headerTitle}>{translate('RUM', locale)}</Title>
+            <Title style={styles.headerTitle}>{translate('Self', locale)}</Title>
           </Body>
           <Right style={{ flex: 2 }}>
             <Button transparent onPress={this.handleLogout}>
@@ -989,11 +934,12 @@ class InteractRumScreen extends Component {
 }
 
 function mapStateToProps(state) {
-  const { counter, auth, organization } = state;
+  const { auth, user, register, organization } = state;
 
   return {
-    counter,
     auth,
+    user,
+    register,
     organizationColor: organization.developerJson
   }
 }
@@ -1004,4 +950,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(InteractRumScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SelfScreen);

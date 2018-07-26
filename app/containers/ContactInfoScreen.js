@@ -29,88 +29,113 @@ import { StyleSheet, ImageBackground, Alert } from 'react-native';
 import Toast, {DURATION} from 'react-native-easy-toast'
 import NavigationBar from 'react-native-navbar';
 import { NavigationActions } from 'react-navigation';
+import {bindActionCreators} from 'redux';
 import { increment, decrement } from '../actions/counterActions';
 import { Actions } from 'react-native-router-flux';
 import { translate } from '../i18n';
-import { logout } from '../actions/loginActions';
+import * as loginActions from '../actions/loginActions';
 import CustomFooter from '../components/CustomFooter';
+import * as uiColor from '../constants/uiColor';
 
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#053C5C',
-  },
-  headerTitle: {
-    color: '#FFF',
-    fontSize: 18,
-    alignSelf: "center",
-  },
-  rumPhotoArea: {
-    width: '100%',
-    height: 145,
-  },
-  rumBackground: {
-    width: '100%',
-    height: '100%',
-  },
-  rumPhoto: {
-    width: 60,
-    height: 60,
-    marginTop: 11,
-    alignSelf: 'center',
-  },
-  rumInfoName: {
-    color: '#335f7a',
-    fontSize: 17,
-    alignSelf: 'center',
-    marginTop: 10,
-    lineHeight: 19,
-  },
-  rumInfoDate: {
-    color: '#7E888D',
-    fontSize: 8,
-    alignSelf: 'center',
-  },
-  rumInfoEdit: {
-    alignSelf: 'center',
-    marginTop: 8,
-    height: 20,
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-  rumInfoEditText: {
-    color: '#358A83',
-    fontSize: 12,
-  },
-  formLabel: {
-    // fontSize: 10,
-  },
-  formInput: {
-    // fontSize: 12,
-  },
-});
+function createStyleSheet(organizationColor) {
+	return StyleSheet.create({
+    header: {
+      backgroundColor: uiColor.getSecondaryColor(organizationColor),
+    },
+    headerTitle: {
+      color: '#FFF',
+      fontSize: 18,
+      alignSelf: "center",
+    },
+    rumPhotoArea: {
+      width: '100%',
+      height: 145,
+    },
+    rumBackground: {
+      width: '100%',
+      height: '100%',
+    },
+    rumPhoto: {
+      width: 60,
+      height: 60,
+      marginTop: 11,
+      alignSelf: 'center',
+    },
+    rumInfoName: {
+      color: '#335f7a',
+      fontSize: 17,
+      alignSelf: 'center',
+      marginTop: 10,
+      lineHeight: 19,
+    },
+    rumInfoDate: {
+      color: '#7E888D',
+      fontSize: 8,
+      alignSelf: 'center',
+    },
+    rumInfoEdit: {
+      alignSelf: 'center',
+      marginTop: 8,
+      height: 20,
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
+    rumInfoEditText: {
+      color: uiColor.getPrimaryColor(organizationColor),
+      fontSize: 12,
+    },
+    formLabel: {
+      // fontSize: 10,
+    },
+    formInput: {
+      // fontSize: 12,
+    },
+  });
+}
+
 class ContactInfoScreen extends Component {
-  state = {
-    activePage: 'interact',
-  };
+
   constructor(props) {
     super(props);
+    this.state = {
+      activePage: 'interact',
+      styles: createStyleSheet(props.organizationColor)
+    }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps) {
+      this.setState({
+        styles: createStyleSheet(nextProps.organizationColor)
+      })
+    }
+  }
+
   goBack = () => {
     this.props.navigation.dispatch(NavigationActions.back());
   }
+
   editProfile = () => {
     console.log('Edit Profile');
   }
+
+	handleLogout = () => {
+		this.props.loginActions.logoutRequest(
+			this.props.auth.access_token, this.props.auth.token_type
+		)
+	}
   renderView = (locale) => {
+    const { styles } = this.state
+
     return (
       <View>
         <View style={styles.rumPhotoArea}>
-          <ImageBackground 
-            style={styles.rumBackground} 
+          <ImageBackground
+            style={styles.rumBackground}
             source={require('../images/rum_profile_background.png')} >
             <Thumbnail
               square
-              style={styles.rumPhoto} 
+              style={styles.rumPhoto}
               source={require('../images/rum_profile_photo.png')} />
             <View style={styles.rumInfo} >
               <Text style={styles.rumInfoName}>
@@ -119,8 +144,8 @@ class ContactInfoScreen extends Component {
               <Text style={styles.rumInfoDate}>
                 Member since 06/06/2018
               </Text>
-              <Button 
-                transparent 
+              <Button
+                transparent
                 style={styles.rumInfoEdit}
                 onPress={() => this.editProfile()}>
                 <Text style={styles.rumInfoEditText}>
@@ -159,8 +184,8 @@ class ContactInfoScreen extends Component {
   }
   render() {
     const locale = 'en';
-    const { user } = this.props;
-    const { activePage } = this.state;
+    const { auth } = this.props;
+    const { activePage, styles } = this.state;
     return (
       <Container>
         <Header style={styles.header}>
@@ -173,7 +198,7 @@ class ContactInfoScreen extends Component {
             <Title style={styles.headerTitle}>{translate('Contact Info', locale)}</Title>
           </Body>
           <Right style={{ flex: 2 }}>
-            <Button transparent onPress={this.props.logout}>
+            <Button transparent onPress={this.handleLogout}>
               <Icon name="more" />
             </Button>
           </Right>
@@ -189,18 +214,19 @@ class ContactInfoScreen extends Component {
 }
 
 function mapStateToProps(state) {
-  const { counter, user } = state;
+  const { counter, auth, organization } = state;
 
   return {
     counter,
-    user,
+    auth,
+    organizationColor: organization.developerJson
   }
 }
 
-const actions = {
-  increment,
-  decrement,
-  logout
+function mapDispatchToProps(dispatch) {
+  return {
+		loginActions: bindActionCreators(loginActions, dispatch)
+  }
 }
 
-export default connect(mapStateToProps, actions)(ContactInfoScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(ContactInfoScreen);

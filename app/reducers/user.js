@@ -1,50 +1,73 @@
 import * as types from '../actions/actionTypes';
+import { userRequest } from '../actions/userActions';
 
 const initialState = {
-  isAuthenticated: false,
+  isGotUserInfo: false,
   isFetching: false,
-  access_token: '',
-  token_type: '',
-  expires_in: 0,
-  userName: '',
-  errorMessage: false
+	failure: false,
+	errorMessage: false,
+  userInfo: false,
+	user
 };
 
 export default function user(state = initialState, action) {
   switch(action.type) {
-    case types.LOGIN.REQUEST:
+    case types.USER.REQUEST:
       return Object.assign({}, state, {
         isFetching: true,
-        isAuthenticated: false,
-        errorMessage: false
+        isGotUserInfo: false,
+        errorMessage: false,
+				userInfo: false
       });
-    case types.LOGIN.SUCCESS:
+    case types.USER.SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        isAuthenticated: true,
+        isGotUserInfo: true,
         failure: false,
-        access_token: action.access_token,
-        userName: action.userName,
+        userInfo: action.Data
       });
-    case types.LOGIN.FAILURE:
+    case types.USER.FAILURE:
       return Object.assign({}, state, {
         isFetching: false,
-        isAuthenticated: false,
+        isGotUserInfo: false,
         failure: true,
-        errorMessage: action.err,
+        errorMessage: action.err
       });
-    case types.LOGIN.INIT:
+    case types.USER.INIT:
       return Object.assign({}, state, {
-        isAuthenticated: false,
+        isGotUserInfo: false,
         isFetching: false,
-        access_token: '',
-        token_type: '',
-        expires_in: 0,
-        userName: '',
-        errorMessage: false
+				userInfo: false,
+        errorMessage: false,
       });
-    case types.LOGOUT:
-      return initialState;
+
+    //user update actions
+    case types.USER_UPDATE.REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true,
+        isGotUserInfo: false,
+        errorMessage: false,
+      });
+    case types.USER_UPDATE.SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        isGotUserInfo: true,
+        failure: false,
+      });
+    case types.USER_UPDATE.FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+        isGotUserInfo: false,
+        failure: true,
+        errorMessage: action.err
+      });
+    case types.USER_UPDATE.INIT:
+      return Object.assign({}, state, {
+        isGotUserInfo: false,
+        isFetching: false,
+        errorMessage: false,
+      });
+
     default:
       return state;
   }

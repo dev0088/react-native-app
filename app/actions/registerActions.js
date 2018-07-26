@@ -31,7 +31,6 @@ export function registerInit() {
 }
 
 export function registerSuccess(payload) {
-  Actions.push('home')
   return {
     type: types.REGISTER.SUCCESS,
     ...payload

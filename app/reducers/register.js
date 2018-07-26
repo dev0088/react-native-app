@@ -3,6 +3,7 @@ import * as types from '../actions/actionTypes';
 const initialState = {
   isRegistered: false,
   isFetching: false,
+  failure: false,
   errorMessage: false
 };
 
@@ -32,7 +33,8 @@ export default function register(state = initialState, action) {
       return Object.assign({}, state, {
         isRegistered: false,
         isFetching: false,
-        errorMessage: false
+        errorMessage: false,
+        failure: false
       });
     default:
       return state;

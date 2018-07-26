@@ -1,8 +1,10 @@
 import React from 'react'
 import { take, put, call, fork, select } from 'redux-saga/effects'
 import * as types from '../actions/actionTypes'
-import config from '../config'
+import apiConfig from '../constants/api';
 import { registerSuccess, registerFailure } from '../actions/registerActions'
+import { loginRequestFromRegistration } from '../actions/loginFromRegistrationActions'
+import { generateErrorMessage } from './utils'
 
 function registerCall({
   emailAddress,
@@ -18,7 +20,7 @@ function registerCall({
     let body
     body =
       `ApiKey=` +
-      config.apiKey +
+      apiConfig.apiKey +
       `&InviteCode=` +
       inviteCode +
       `&Username=` +
@@ -43,10 +45,10 @@ function registerCall({
       'objective_name' +
       `&Chapter=` +
       'chapter_name'
-    fetch(`${config.url}/api/Account/Register`, {
+    fetch(`${apiConfig.url}/api/Account/Register`, {
       credentials: 'include',
       method: 'post',
-      headers: config.formHeaders,
+      headers: apiConfig.formHeaders,
       body: body
     })
       .then(response => response.json())
@@ -90,30 +92,11 @@ function* watchRegisterRequest() {
       const response = yield call(registerCall, payload)
 
       if (response.Success) {
-        console.log('SAGA REGISTER SUCCESS: ', response)
         yield put(registerSuccess(response))
+        // Try to auto-login
+        yield put(loginRequestFromRegistration(userName, password))
       } else {
-        let errorMsg =
-          response.ValidationErrors == null ||
-          response.ValidationErrors == undefined
-            ? 'Unexpected error!'
-            : response.ValidationErrors[0]
-        console.log('SAGA REGISTER UNEXPECTED ERR: ', response)
-        if (
-          response.ValidationErrors != null &&
-          response.ValidationErrors != undefined
-        )
-          errorMsg = response.ValidationErrors[0]
-        else if (
-          response.ModelState != null &&
-          response.ModelState != undefined
-        ) {
-          Object.keys(response.ModelState).forEach(function(key) {
-            errorMsg = response.ModelState[key][0]
-            return
-          })
-        }
-        yield put(registerFailure(errorMsg))
+        yield put(registerFailure(generateErrorMessage(response)))
       }
     } catch (err) {
       console.log('SAGA REGISTER ERR: ', err)

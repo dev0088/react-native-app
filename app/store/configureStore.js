@@ -5,36 +5,52 @@ import * as storage from 'redux-storage';
 import createEngine from 'redux-storage-engine-reactnativeasyncstorage';
 import createSagaMiddleware from 'redux-saga';
 import sagas from '../sagas';
-import devTools from 'remote-redux-devtools';
+import {composeWithDevTools} from 'remote-redux-devtools';
 
 const isDebuggingInChrome = __DEV__ && !!window.navigator.userAgent;
-
-const logger = createLogger({
-  predicate: (getState, action) => isDebuggingInChrome,
-  collapsed: true,
-  duration: true,
-  diff: true,
-});
 
 export default function configureStore(onComplete) {
 
   const engine = createEngine('AppTree');
   const storeMiddleware = storage.createMiddleware(engine);
   const sagaMiddleware = createSagaMiddleware();
+	let middleware = [sagaMiddleware, storeMiddleware]
+	let store
+	if (process.env.NODE_ENV !== 'production') {
+		const logger = createLogger({
+		  predicate: (getState, action) => isDebuggingInChrome,
+		  collapsed: true,
+		  duration: true,
+		  diff: true,
+		});
 
-  let store = createStore(
-    storage.reducer(reducers), //Apply redux-storage so we can persist Redux state to disk
-    compose(
-      applyMiddleware(
-        sagaMiddleware,
-        storeMiddleware,
-        logger,
-      ),
-      devTools(),
-    ),
-  );
+		middleware = [
+			...middleware
+		]
+		// const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+		store = createStore(
+			storage.reducer(reducers),
+			//Apply redux-storage so we can persist Redux state to disk
+			composeWithDevTools(
+				applyMiddleware(
+					...middleware, logger
+				),
+			)
+		);
+	} else {
+		const composeEnhancers = compose;
+		store = createStore(
+			storage.reducer(reducers), //Apply redux-storage so we can persist Redux state to disk
+			composeEnhancers(
+				applyMiddleware(
+					...middleware
+				),
+			),
+		);
+	}
 
-  if (isDebuggingInChrome) {
+
+	if (isDebuggingInChrome) {
     window.store = store;
   }
 

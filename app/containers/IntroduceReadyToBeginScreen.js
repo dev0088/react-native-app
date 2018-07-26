@@ -18,21 +18,24 @@ import {
   Thumbnail
 } from 'native-base'
 import { connect } from 'react-redux'
-import { StyleSheet, ImageBackground } from 'react-native'
-import NavigationBar from 'react-native-navbar'
 import {bindActionCreators} from 'redux';
+import { StyleSheet, ImageBackground, Modal } from 'react-native'
+import NavigationBar from 'react-native-navbar'
+import { increment, decrement } from '../actions/counterActions'
 import { Actions } from 'react-native-router-flux'
-// import VideoPlayer from 'react-native-video-controls';
 import { Video } from 'expo'
 import VideoPlayer from '@expo/videoplayer'
 import { translate } from '../i18n'
-import * as loginActions from '../actions/loginActions';
-import * as userActions from '../actions/userActions';
 import CustomFooter from '../components/CustomFooter'
-import * as uiColor from '../constants/uiColor';
+import Spacer from '../components/Spacer'
+import Dimensions from 'Dimensions';
+import * as uiColor from '../constants/uiColor'
+import * as onboardingActions from '../actions/onboardingActions'
+
+const {width, height} = Dimensions.get('window');
 
 function createStyleSheet(organizationColor) {
-	return StyleSheet.create({
+  return StyleSheet.create({
     header: {
       backgroundColor: uiColor.getSecondaryColor(organizationColor)
     },
@@ -41,8 +44,35 @@ function createStyleSheet(organizationColor) {
       fontSize: 18,
       alignSelf: 'center'
     },
+  	content: {
+  		padding: 44,
+  		backgroundColor: 'rgba(155, 155, 155, 0.85)'
+  	},
+  	headerWelcome: {
+  		color: '#FFF',
+  		fontSize: 32,
+  		textAlign: 'left'
+  	},
+  	headerTitle: {
+  		color: '#FFF',
+  		fontSize: 44,
+  		lineHeight: 48,
+  		fontWeight: '600',
+  		textAlign: 'left'
+  	},
+  	header3: {
+  		color: '#FFFFFF',
+  		fontSize: 20,
+  		fontWeight: '600',
+  		textAlign: 'left'
+  	},
+  	description: {
+  		color: '#FFFFFF',
+  		fontSize: 18,
+  		textAlign: 'left'
+  	},
     topNotificationView: {
-      backgroundColor: uiColor.getThirdColor(organizationColor), // '#BC1F3D',
+      backgroundColor: uiColor.getThirdColor(organizationColor), //'#BC1F3D',
       width: '100%',
       padding: 12,
       paddingTop: 30,
@@ -121,44 +151,53 @@ function createStyleSheet(organizationColor) {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    }
+    },
+  	slideShow: {
+  		display: 'flex'
+  	},
+  	validateButton: {
+  		backgroundColor: uiColor.getPrimaryColor(organizationColor)
+  	},
+  	buttonText: {
+  		color: '#FFF',
+  		fontSize: 18
+  	},
   })
 }
 
-class HomeScreen extends Component {
-
+class IntroduceReadyToBeginScreen extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       activePage: 'actions',
       videoState: 0,
       shouldPlay: true,
+      visibleReadyModal: true,
       styles: createStyleSheet(props.organizationColor)
     }
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    if (nextProps) {
+  componentWillMount() {
+    this.props.onboardingActions.checkedOnboardingReadToBegin()
+  }
+
+	componentWillReceiveProps(nextProps) {
+		// if (this.state.visibleReadyModal) {
+		// 	this.setState({
+    //     visibleReadyModal: false,
+    //   })
+		// }
+    if (nextProps.organizationColor) {
       this.setState({
         styles: createStyleSheet(nextProps.organizationColor)
       })
     }
-  }
+	}
 
-	componentDidMount = () => {
-    const { auth, register } = this.props
-    if (register.isRegistered && auth.fromRegistration && !auth.checkedOnboarding.readyToBegin) {
-      Actions.push('introduceReadyToBegin')
-    }
-  }
-
-  playVideo = () => {
+	playVideo = () => {
     let $this = this
     this.setState({ videoState: 1 })
-    // setTimeout(function() {
-    //   console.log($this.videoRef);
-    //   $this.videoRef.presentFullscreenPlayer();
-    // }, 500)
   }
 
 	handlePlayAndPause = () => {
@@ -167,35 +206,28 @@ class HomeScreen extends Component {
     }))
   }
 
-	handleLogout = () => {
-		this.props.loginActions.logoutRequest(
-			this.props.auth.access_token, this.props.auth.token_type
-		)
+	handleNext = () => {
+		this.setState({visibleReadyModal: false})
+		// Actions.push('introduceWelcomeToPursuit')
+    Actions.push('home')
 	}
 
-  render() {
+	handleCloseReadyModal = () => {
+		this.setState({
+			visibleReadyModal: false
+		})
+	}
+
+	render() {
     const locale = 'en'
     const { auth } = this.props
-    const { activePage, videoState, styles } = this.state
+    const { activePage, videoState, visibleReadyModal, styles } = this.state
     let notification = {
       title: 'TOP Notification for User',
       content: 'Subtitle of notification'
     }
     return (
       <Container>
-        <Header style={styles.header}>
-          <Left style={{ flex: 1 }} />
-          <Body style={{ flex: 3 }}>
-            <Title style={styles.headerTitle}>
-              {translate('Actions', locale)}
-            </Title>
-          </Body>
-          <Right style={{ flex: 1 }}>
-            <Button transparent onPress={this.handleLogout}>
-              <Icon name="more" />
-            </Button>
-          </Right>
-        </Header>
         <Content>
           <View style={{ padding: 6 }}>
             {notification.title && (
@@ -358,6 +390,47 @@ class HomeScreen extends Component {
             </View>
           </View>
         </Content>
+				<Modal
+					visible={visibleReadyModal}
+					transparent={true}
+					animationType={'fade'}
+					onRequestClose={() => {
+						this.handleCloseReadyModal()
+					}}
+				>
+					<View style={styles.content}>
+						<Spacer size={72} />
+						<View>
+							<H1 style={styles.headerWelcome}>Ready to</H1>
+						</View>
+						<Spacer size={8} />
+						<View>
+							<H1 style={styles.headerTitle}>Begin?</H1>
+						</View>
+						<Spacer size={47} />
+						<View>
+							<H1 style={styles.header3}>Subtitle.</H1>
+						</View>
+						<Spacer size={19} />
+						<Text style={styles.description}>
+							Text here.
+						</Text>
+						<Spacer size={19} />
+						<View>
+							<H1 style={styles.header3}>Text again.</H1>
+						</View>
+						<Spacer size={153} />
+						<Button
+							full
+							style={styles.validateButton}
+							onPress={this.handleNext}
+						>
+							<Text style={styles.buttonText}>
+								{translate('Get Started', locale)}
+							</Text>
+						</Button>
+					</View>
+				</Modal>
         <CustomFooter active={activePage} locale={locale} />
       </Container>
     )
@@ -365,23 +438,22 @@ class HomeScreen extends Component {
 }
 
 function mapStateToProps(state) {
-  const { register, auth, organization } = state
+  const { counter, auth, organization } = state
 
   return {
-    register,
+    counter,
     auth,
     organizationColor: organization.developerJson
   }
 }
 
 function mapDispatchToProps(dispatch) {
-  return {
-		loginActions: bindActionCreators(loginActions, dispatch),
-		userActions: bindActionCreators(userActions, dispatch)
-  }
+	return {
+		onboardingActions: bindActionCreators(onboardingActions, dispatch)
+	}
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(HomeScreen)
+)(IntroduceReadyToBeginScreen)

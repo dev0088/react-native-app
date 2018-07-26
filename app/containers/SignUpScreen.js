@@ -3,6 +3,11 @@ import PropTypes from 'prop-types'
 import {
 	Container,
 	Content,
+	Header,
+	Left,
+	Right,
+	Icon,
+	Title,
 	Text,
 	Form,
 	Item,
@@ -20,132 +25,146 @@ import {
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as registerActions from '../actions/registerActions'
+import * as loginFromRegistrationActions from '../actions/loginFromRegistrationActions'
 import { Actions } from 'react-native-router-flux'
+import { NavigationActions } from 'react-navigation';
 import { StyleSheet, Modal } from 'react-native'
 import { translate } from '../i18n'
 import Loading from './Loading'
 import Messages from '../components/Messages'
 import Spacer from '../components/Spacer'
+import defaultValues from '../constants/defaultValues'
+import * as uiColor from '../constants/uiColor'
 
-const styles = StyleSheet.create({
-	opacity: {
-		opacity: 0.8
-	},
-	content: {
-		padding: 44
-	},
-	header: {
-		color: '#053C5C',
-		fontSize: 16,
-		textAlign: 'center'
-	},
-	button: {
-		backgroundColor: '#7E888D'
-	},
-	validateButton: {
-		backgroundColor: '#358A83'
-	},
-	buttonText: {
-		color: '#FFF',
-		fontSize: 18
-	},
-	thumbnail: {
-		alignSelf: 'center',
-		height: 35,
-		width: 35
-	},
-	input: {
-		color: '#053C5C'
-	},
-	note: {
-		fontSize: 10,
-		color: '#A1A1A1'
-	},
-	alertMainView: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		height: 144,
-		width: '70%',
-		borderWidth: 1,
-		backgroundColor: '#FFF',
-		borderColor: '#CCC',
-		borderRadius: 7
-	},
-	alertTitle: {
-		fontSize: 14,
-		color: '#000',
-		textAlign: 'center',
-		paddingTop: 20,
-		height: '28%',
-		fontWeight: 'bold'
-	},
-	alertMessage: {
-		fontSize: 13,
-		color: '#111',
-		textAlign: 'center',
-		paddingLeft: 15,
-		paddingRight: 15,
-		paddingTop: 5,
-		height: '47%'
-	},
-	buttonStyle: {
-		color: '#0076FF',
-		textAlign: 'center',
-		fontSize: 17,
-		padding: 6,
-		width: '50%',
-		justifyContent: 'center',
-		alignItems: 'center',
-		height: '100%',
-		fontWeight: 'bold'
-	},
-	alertTerm: {
-		fontSize: 13,
-		color: '#000',
-		textAlign: 'center',
-		marginTop: 15,
-		paddingLeft: 5,
-		paddingRight: 5,
-		textDecorationLine: 'underline',
-		textDecorationStyle: 'solid',
-		textDecorationColor: '#000',
-		fontWeight: 'bold'
-	},
-	alertVerticalDivider: {
-		width: '100%',
-		height: 1,
-		backgroundColor: '#CDCED2'
-	},
-	alertHorizontalDivider: {
-		width: 1,
-		height: '100%',
-		backgroundColor: '#CDCED2'
-	},
-	slideShow: {
-		display: 'flex'
-	},
-	slideHide: {
-		display: 'none'
-	},
-	validateJobButton: {
-		backgroundColor: '#053C5C',
-		height: 80,
-		padding: 10
-	},
-	jobButton: {
-		backgroundColor: '#B7BABD',
-		height: 80,
-		padding: 10
-	},
-	jobButtonText: {
-		fontSize: 20,
-		color: '#FFF'
-	},
-	jobButtonNoteText: {
-		fontSize: 14,
-		color: '#FFF'
-	}
-})
+function createStyleSheet(organizationColor) {
+  return StyleSheet.create({
+		opacity: {
+			opacity: 0.8
+		},
+		content: {
+			padding: 44
+		},
+		header: {
+			backgroundColor: uiColor.getSecondaryColor(organizationColor)
+		},
+		headerTitle: {
+			color: '#FFF',
+			fontSize: 18,
+			alignSelf: 'center'
+		},
+		topTitle: {
+			color: uiColor.getSecondaryColor(organizationColor),
+			fontSize: 16,
+			textAlign: 'center'
+		},
+		button: {
+			backgroundColor: '#7E888D'
+		},
+		validateButton: {
+			backgroundColor: uiColor.getPrimaryColor(organizationColor)
+		},
+		buttonText: {
+			color: '#FFF',
+			fontSize: 18
+		},
+		thumbnail: {
+			alignSelf: 'center',
+			height: 35,
+			width: 35
+		},
+		input: {
+			color: uiColor.getSecondaryColor(organizationColor)
+		},
+		note: {
+			fontSize: 10,
+			color: '#A1A1A1'
+		},
+		alertMainView: {
+			alignItems: 'center',
+			justifyContent: 'center',
+			height: 144,
+			width: '70%',
+			borderWidth: 1,
+			backgroundColor: '#FFF',
+			borderColor: '#CCC',
+			borderRadius: 7
+		},
+		alertTitle: {
+			fontSize: 14,
+			color: '#000',
+			textAlign: 'center',
+			paddingTop: 20,
+			height: '28%',
+			fontWeight: 'bold'
+		},
+		alertMessage: {
+			fontSize: 13,
+			color: '#111',
+			textAlign: 'center',
+			paddingLeft: 15,
+			paddingRight: 15,
+			paddingTop: 5,
+			height: '47%'
+		},
+		buttonStyle: {
+			color: '#0076FF',
+			textAlign: 'center',
+			fontSize: 17,
+			padding: 6,
+			width: '50%',
+			justifyContent: 'center',
+			alignItems: 'center',
+			height: '100%',
+			fontWeight: 'bold'
+		},
+		alertTerm: {
+			fontSize: 13,
+			color: '#000',
+			textAlign: 'center',
+			marginTop: 15,
+			paddingLeft: 5,
+			paddingRight: 5,
+			textDecorationLine: 'underline',
+			textDecorationStyle: 'solid',
+			textDecorationColor: '#000',
+			fontWeight: 'bold'
+		},
+		alertVerticalDivider: {
+			width: '100%',
+			height: 1,
+			backgroundColor: '#CDCED2'
+		},
+		alertHorizontalDivider: {
+			width: 1,
+			height: '100%',
+			backgroundColor: '#CDCED2'
+		},
+		slideShow: {
+			display: 'flex'
+		},
+		slideHide: {
+			display: 'none'
+		},
+		validateJobButton: {
+			backgroundColor: uiColor.getSecondaryColor(organizationColor),
+			height: 80,
+			padding: 10
+		},
+		jobButton: {
+			backgroundColor: '#B7BABD',
+			height: 80,
+			padding: 10
+		},
+		jobButtonText: {
+			fontSize: 20,
+			color: '#FFF'
+		},
+		jobButtonNoteText: {
+			fontSize: 14,
+			color: '#FFF'
+		}
+	})
+}
 
 const TermsAlertView = (
 	<Text>
@@ -155,25 +174,8 @@ const TermsAlertView = (
 	</Text>
 )
 
-const school = 'abcd'
-const objective = 'abcd'
-const chapter = 'abcd'
-
 class SignUpScreen extends React.Component {
-	// static propTypes = {
-	//   error: PropTypes.string,
-	//   loading: PropTypes.bool.isRequired,
-	//   locale: PropTypes.string,
-	//   onFormSubmit: PropTypes.func.isRequired,
-	// }
-	//
-	static navigationOptions = () => ({
-		title: 'Create Account',
-		headerTintColor: '#FFF',
-		headerStyle: {
-			backgroundColor: '#053C5C'
-		}
-	})
+
 	static defaultProps = {
 		error: null
 	}
@@ -181,6 +183,7 @@ class SignUpScreen extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			styles: createStyleSheet(props.organizationColor),
 			apiKey: '',
 			emailAddress: '',
 			password: '',
@@ -188,9 +191,12 @@ class SignUpScreen extends React.Component {
 			firstName: '',
 			lastName: '',
 			phoneNumber: '',
-			tempCode: '0wJKn',
+			tempCode: defaultValues.DEFAULT_INVITE_CODE, //'0vvJKn',
 			inviteCode: '',
 			userName: '',
+			school: defaultValues.DEFAULT_SCHOOL,
+			objective: defaultValues.DEFAULT_OBJECTIVE,
+			chapter: defaultValues.DEFAULT_CHAPTER,
 			nextButtonValidate: false,
 			errorMessages: [],
 			errorShow: false,
@@ -199,7 +205,8 @@ class SignUpScreen extends React.Component {
 			jobType: 0,
 			showSuccessAlert: false,
 			showFailureAlert: false,
-			registerRequest: false
+			registerRequest: false,
+			logo: props.organizationLogo ? {uri: defaultValues.DEFAULT_LOGO_URL + props.organizationLogo} : require('../images/logo.png')
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -218,20 +225,20 @@ class SignUpScreen extends React.Component {
 			showSuccessAlert,
 			showFailureAlert
 		} = this.state
-
 		// check the inviteCode is same as tempCode
 		if (inviteCode !== tempCode) {
 			let result = []
 			const locale = 'en'
-			result[7] = translate('Input validate code', locale)
+			result[7] = translate('Enter validate invite code', locale)
 			this.setState({
 				errorShow: true,
 				errorMessages: result
 			})
-			console.log(this.state.errorMessages)
-			console.log(this.state.errorShow)
+			// console.log(this.state.errorMessages)
+			// console.log(this.state.errorShow)
 		}
 		const { register } = this.props
+
 		if (
 			jobType > 0 &&
 			inviteCode === tempCode &&
@@ -247,9 +254,13 @@ class SignUpScreen extends React.Component {
 				lastName,
 				phoneNumber,
 				inviteCode,
-				userName
+				userName,
+				school,
+				objective,
+				chapter,
 			} = this.state
 			this.setState({ registerRequest: true })
+
 			this.props.actions.registerRequest(
 				emailAddress,
 				password,
@@ -258,18 +269,24 @@ class SignUpScreen extends React.Component {
 				lastName,
 				phoneNumber,
 				inviteCode,
-				userName
+				userName,
+				school,
+				objective,
+				chapter
 			)
 		}
 	}
+
 	validateEmail = email => {
 		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 		return re.test(String(email).toLowerCase())
 	}
+
 	validateNumber = number => {
 		var re = /^[\d\.\-]+$/
 		return re.test(number)
 	}
+
 	checkValidataion = () => {
 		const {
 			emailAddress,
@@ -306,10 +323,10 @@ class SignUpScreen extends React.Component {
 			result[4] = translate('Input password', locale)
 			validate = false
 		}
-		// else if (password.length < 8){
-		// 	result[4] = translate('Input at least 8 characters', locale);
-		// 	validate = false;
-		// }
+		else if (password.length < 8){
+			result[4] = translate('Input at least 8 characters', locale);
+			validate = false;
+		}
 		if (passwordConfirm == '' || passwordConfirm != password) {
 			result[5] = translate('Input the same confirm password', locale)
 			validate = false
@@ -325,6 +342,7 @@ class SignUpScreen extends React.Component {
 		})
 		return validate
 	}
+
 	handleChange = (name, val) => {
 		this.setState(
 			{
@@ -336,29 +354,37 @@ class SignUpScreen extends React.Component {
 			}
 		)
 	}
+
 	handleNext = () => {
 		const { nextButtonValidate } = this.state
 		if (nextButtonValidate) {
+			this.props.actions.registerInit()
+			this.props.autoLoginActions.loginInitFromRegistration()
 			this.showAlert(true)
 		} else {
 			this.setState({ errorShow: true })
 		}
 	}
+
 	generateCode = () => {
-		this.setState({ tempCode: '0wJKn' })
+		this.setState({ tempCode: defaultValues.DEFAULT_INVITE_CODE })
 	}
+
 	showAlert = b => {
 		if (b) this.generateCode()
 		this.setState({ alertVisible: b })
 	}
+
 	showTerm = () => {
 		this.showAlert(false)
 		Actions.push('term')
 	}
+
 	showPolicy = () => {
 		this.showAlert(false)
 		Actions.push('policy')
 	}
+
 	clickAgree = () => {
 		this.showAlert(false)
 		this.setState({ currentSlide: 1 })
@@ -366,30 +392,55 @@ class SignUpScreen extends React.Component {
 	setJobType = type => {
 		this.setState({ jobType: type })
 	}
+
 	componentDidMount = () => {
-		this.props.actions.registerInit()
-		this.checkValidataion()
+		this.isMounted = true
+		if (this.isMounted) {
+			this.checkValidataion()
+		}
 	}
+
+	componentWillUnmount() {
+		this.isMounted = false
+	}
+
 	componentWillReceiveProps = nextProps => {
-		const { register } = nextProps
+
+		const { register, organizationLogo, organizationColor } = nextProps
+
+		if (nextProps) {
+			this.setState({
+				styles: organizationColor ? createStyleSheet(organizationColor) : this.state.styles,
+				logo: organizationLogo ? {uri: defaultValues.DEFAULT_LOGO_URL + organizationLogo} : this.state.logo
+			})
+		}
+
 		if (register.isRegistered) {
-			this.setState({ showSuccessAlert: true })
-			setTimeout(() => {
-				// Actions.push('login');
-				this.setState({
-					showSuccessAlert: false,
-					registerRequest: false
-				})
-			}, 5000)
+			if (this.isMounted) {
+				this.setState({ showSuccessAlert: true })
+				setTimeout(() => {
+					// Actions.push('login');
+					this.setState({
+						showSuccessAlert: false,
+						registerRequest: false
+					})
+				}, 1000)
+			} else {
+				this.state.showSuccessAlert = true
+			}
 		}
 		if (register.failure) {
-			this.setState({ showFailureAlert: true })
-			setTimeout(() => {
-				this.setState({
-					showFailureAlert: false,
-					registerRequest: false
-				})
-			}, 5000)
+			if (this.isMounted) {
+				this.setState({ showFailureAlert: true })
+				setTimeout(() => {
+					this.setState({
+						showFailureAlert: false,
+						registerRequest: false
+					})
+				}, 5000)
+			} else {
+				this.state.showFailureAlert = true
+			}
 		}
 	}
 	//
@@ -398,6 +449,10 @@ class SignUpScreen extends React.Component {
 	//     .then(() => Actions.login())
 	//     .catch(e => console.log(`Error: ${e}`));
 	// }
+
+	goBack = () => {
+    this.props.navigation.dispatch(NavigationActions.back());
+  }
 
 	render() {
 		// const { loading, error, locale } = this.props;
@@ -415,17 +470,32 @@ class SignUpScreen extends React.Component {
 			showFailureAlert,
 			registerRequest,
 			errorMessages,
-			errorShow
+			errorShow,
+			styles,
+			logo
 		} = this.state
-
 		return (
 			<Container>
+				<Header style={styles.header}>
+					<Left style={{ flex: 1 }}>
+						<Button transparent onPress={this.goBack}>
+							<Icon name="arrow-back" />
+						</Button>
+					</Left>
+					<Body style={{ flex: 3 }}>
+						<Title style={styles.headerTitle}>
+							{translate('Create Account', locale)}
+						</Title>
+					</Body>
+					<Right style={{ flex: 1 }}>
+					</Right>
+				</Header>
 				<Content
 					style={[styles.content, this.state.alertVisible && styles.opacity]}
 				>
 					<View style={currentSlide != 0 ? styles.slideHide : styles.slideShow}>
 						<View>
-							<H1 style={styles.header}>Tell us about yourself.</H1>
+							<H1 style={styles.topTitle}>Tell us about yourself.</H1>
 						</View>
 						<Spacer size={20} />
 						<Body>
@@ -541,7 +611,7 @@ class SignUpScreen extends React.Component {
 					</View>
 					<View style={currentSlide != 1 ? styles.slideHide : styles.slideShow}>
 						<View>
-							<H1 style={styles.header}>{translate('I am a', locale)}...</H1>
+							<H1 style={styles.topTitle}>{translate('I am a', locale)}...</H1>
 						</View>
 						{showSuccessAlert && (
 							<Messages
@@ -584,7 +654,7 @@ class SignUpScreen extends React.Component {
 							</Body>
 						</Button>
 						<Spacer size={20} />
-						<H1 style={styles.header}>
+						<H1 style={styles.topTitle}>
 							{translate('I have an invitation code', locale)}:
 						</H1>
 						<Item>
@@ -604,13 +674,14 @@ class SignUpScreen extends React.Component {
 							full
 							style={
 								jobType > 0 &&
-								inviteCode === tempCode &&
+								// inviteCode === tempCode &&
+								inviteCode &&
 								!showSuccessAlert &&
 								!register.isRegistered
 									? styles.validateButton
 									: styles.button
 							}
-							onPress={() => this.handleSignUp()}
+							onPress={this.handleSignUp}
 						>
 							<Text style={styles.buttonText}>
 								{translate('Sign Up', locale)}
@@ -623,7 +694,7 @@ class SignUpScreen extends React.Component {
 					<Thumbnail
 						square
 						style={styles.thumbnail}
-						source={require('../images/logo.png')}
+						source={logo}
 					/>
 					<Modal
 						visible={this.state.alertVisible}
@@ -705,16 +776,19 @@ class SignUpScreen extends React.Component {
 }
 
 function mapStateToProps(state) {
-	const { register } = state
+	const { register, organization } = state
 
 	return {
-		register
+		register,
+		organizationLogo: organization.logoFilename,
+		organizationColor: organization.developerJson
 	}
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		actions: bindActionCreators(registerActions, dispatch)
+		actions: bindActionCreators(registerActions, dispatch),
+		autoLoginActions: bindActionCreators(loginFromRegistrationActions, dispatch)
 	}
 }
 

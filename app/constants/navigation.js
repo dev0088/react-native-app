@@ -1,4 +1,5 @@
 import Colors from '../../native-base-theme/variables/material';
+import uiColor from './uiColor';
 
 export default {
   navbarProps: {
